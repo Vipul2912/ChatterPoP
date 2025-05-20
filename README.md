@@ -1,4 +1,4 @@
-# ChatterPop  
+# ChatterPoP
 
 A real-time chat web app with theme support, encryption, and media sharing.  
 
@@ -16,7 +16,7 @@ A real-time chat web app with theme support, encryption, and media sharing.
 
 ## Setup  
 ```bash
-git clone https://github.com/your-repo/chatterpop.git  
+git clone https://github.com/Vipul2912/ChatterPoP.git 
 cd chatterpop  
 npm install  
 npm run dev  
