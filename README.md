@@ -2,9 +2,9 @@
 
 A full-stack **real-time chat application** built with modern web technologies and deployed using **containerized DevOps practices**.
 
-This project demonstrates end-to-end implementation of:
+This project demonstrates:
 
-* Application development (frontend + backend)
+* Full-stack development (React + Node.js)
 * Containerization using Docker
 * Multi-service orchestration using Docker Compose
 * Reverse proxy configuration with NGINX
@@ -14,12 +14,11 @@ This project demonstrates end-to-end implementation of:
 
 ## 🚀 Features
 
-* 🔐 User authentication (JWT-based)
+* 🔐 JWT-based authentication
 * 💬 Real-time messaging using Socket.io
-* ☁️ Media upload via Cloudinary
+* ☁️ Media uploads via Cloudinary
 * ⚡ Fast frontend with Vite
 * 📦 Fully containerized architecture
-* 🔄 Service-to-service communication via Docker networking
 
 ---
 
@@ -29,7 +28,6 @@ This project demonstrates end-to-end implementation of:
 
 * React (Vite)
 * Tailwind CSS
-* Axios
 
 ### Backend
 
@@ -37,16 +35,16 @@ This project demonstrates end-to-end implementation of:
 * Express.js
 * Socket.io
 
-### Database & Services
+### Services
 
 * MongoDB Atlas
 * Cloudinary
 
-### DevOps & Infrastructure
+### DevOps
 
 * Docker
 * Docker Compose
-* NGINX (reverse proxy)
+* NGINX
 
 ---
 
@@ -54,18 +52,9 @@ This project demonstrates end-to-end implementation of:
 
 ```
 ChatterPoP/
-├── frontend/              # React frontend (served via NGINX)
-│   ├── src/
-│   ├── Dockerfile
-│   ├── nginx.conf
-│   └── ...
-│
-├── backend/              # Node.js backend API
-│   ├── src/
-│   ├── Dockerfile
-│   └── ...
-│
-├── docker-compose.yml    # Multi-container orchestration
+├── frontend/
+├── backend/
+├── docker-compose.yml
 └── README.md
 ```
 
@@ -73,14 +62,12 @@ ChatterPoP/
 
 ## ⚙️ Prerequisites
 
-Make sure you have the following installed:
-
 * Docker
 * Docker Compose v2
 
-### Verify Installation
+Verify:
 
-```
+```bash
 docker --version
 docker compose version
 ```
@@ -89,192 +76,179 @@ docker compose version
 
 ## 🔑 Environment Variables
 
-Create a `.env` file in the project root (recommended) or configure directly in `docker-compose.yml`.
+Create a `.env` file in project root:
 
-### Required Variables
-
-```
+```bash
 PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_secret
 
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-> ⚠️ Never commit `.env` files to version control.
-
 ---
 
-## 🐳 Running the Application
+# 🐳 Running the Application
+
+## ✅ Method 1: Using Docker Compose (Recommended)
 
 ### 1. Clone Repository
 
-```
+```bash
 git clone <your-repo-url>
 cd ChatterPoP
 ```
 
----
+### 2. Run Application
 
-### 2. Build and Start Services
-
-```
+```bash
 docker compose up --build
 ```
 
-This will:
+### 3. Access
 
-* Build frontend and backend images
-* Create a shared Docker network
-* Start both services
+* Frontend → http://localhost:3000
+* Backend → http://localhost:5000
 
 ---
 
-### 3. Access the Application
+## ⚙️ Method 2: Using Dockerfiles (Manual Setup)
 
-| Service  | URL                   |
-| -------- | --------------------- |
-| Frontend | http://localhost:3000 |
-| Backend  | http://localhost:5000 |
+This method runs frontend and backend containers separately.
+
+---
+
+### 🔧 Step 1: Create Network
+
+```bash
+docker network create chatter-net
+```
+
+---
+
+### 🔧 Step 2: Build Backend Image
+
+```bash
+cd backend
+docker build -t chatter-backend .
+```
+
+---
+
+### ▶️ Step 3: Run Backend Container
+
+```bash
+docker run -d \
+--name backend-service \
+--network chatter-net \
+-p 5000:5000 \
+-e PORT=5000 \
+-e MONGO_URI=your_mongodb_uri \
+-e JWT_SECRET=your_secret \
+-e CLOUDINARY_CLOUD_NAME=your_cloud_name \
+-e CLOUDINARY_API_KEY=your_api_key \
+-e CLOUDINARY_API_SECRET=your_api_secret \
+chatter-backend
+```
+
+---
+
+### 🔧 Step 4: Build Frontend Image
+
+```bash
+cd ../frontend
+docker build -t chatter-frontend .
+```
+
+---
+
+### ▶️ Step 5: Run Frontend Container
+
+```bash
+docker run -d \
+--name chatter-frontend \
+--network chatter-net \
+-p 3000:80 \
+chatter-frontend
+```
+
+---
+
+### 🌐 Access Application
+
+* Frontend → http://localhost:3000
 
 ---
 
 ## 🔄 Application Flow
 
-1. User accesses frontend via NGINX
-2. Frontend sends API requests to `/api`
-3. NGINX proxies `/api` → backend service
-4. Backend interacts with MongoDB & Cloudinary
-5. Socket.io handles real-time communication
-
----
-
-## 🌐 NGINX Reverse Proxy
-
-NGINX is used to:
-
-* Serve frontend static files
-* Route API requests:
-
-  * `/api` → backend
-* Handle WebSocket upgrades for Socket.io
+* Frontend served via NGINX
+* `/api` → proxied to backend
+* Backend → MongoDB + Cloudinary
+* Socket.io → real-time messaging
 
 ---
 
 ## 🔌 Docker Networking
 
-Docker Compose automatically creates a network where:
-
-* Services communicate using service names
+* Containers communicate using service/container names
 * Example:
 
-  * Frontend → `http://backend:5000`
+  * Frontend → `http://backend-service:5000`
 
 ---
 
 ## 🧪 Useful Commands
 
-### Start containers
-
-```
+```bash
 docker compose up
-```
-
-### Rebuild containers
-
-```
-docker compose up --build
-```
-
-### Stop containers
-
-```
 docker compose down
-```
-
-### View logs
-
-```
 docker compose logs -f
 ```
 
 ---
 
-## 🛠️ Development Notes
-
-* Frontend build output: `/dist` (Vite)
-* Backend runs on port `5000`
-* Ensure API base URL is `/api` (not localhost)
-* WebSockets require proper proxy headers (configured in NGINX)
-
----
-
 ## ⚠️ Common Issues
 
-### 1. Blank screen
+### ❌ Docker permission error
 
-* Check browser console
-* Ensure frontend build completed
-
-### 2. API not working
-
-* Verify backend container is running
-* Check NGINX proxy configuration
-
-### 3. Docker permission issues
-
-```
+```bash
 sudo usermod -aG docker $USER
 newgrp docker
 ```
+
+### ❌ API not working
+
+* Check backend container
+* Check NGINX proxy
+
+### ❌ Blank screen
+
+* Check browser console
+* Verify frontend build
 
 ---
 
 ## 🔐 Security Notes
 
-* Do not expose credentials in public repos
-* Rotate keys if accidentally exposed
+* Do not commit `.env`
+* Rotate exposed credentials
 * Use environment variables for secrets
 
 ---
 
 ## 🚀 Future Improvements
 
-* ☸️ Kubernetes deployment (GKE / EKS)
-* 🔁 CI/CD pipeline (GitHub Actions)
-* 📊 Monitoring (Prometheus + Grafana)
-* 📜 Centralized logging (ELK stack)
-* 🔐 Secrets management (Vault / K8s Secrets)
-
----
-
-## 📌 DevOps Highlights
-
-This project demonstrates:
-
-* Containerized microservices architecture
-* Reverse proxy configuration with NGINX
-* Service discovery using Docker networking
-* Environment-based configuration management
-* Real-time system design with WebSockets
+* Kubernetes deployment (GKE/EKS)
+* CI/CD pipeline (GitHub Actions)
+* Monitoring (Prometheus + Grafana)
 
 ---
 
 ## 👨‍💻 Author
 
-**Vipul Tyagi**
+Vipul Tyagi
 DevOps & Cloud Enthusiast
 
----
-
-## ⭐ Contributing
-
-Feel free to fork the repo and submit pull requests.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
