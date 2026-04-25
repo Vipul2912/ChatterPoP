@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: backend-service
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGODB_URI=mongodb+srv://vipultyagi52444:PtirbMul56phw7u7@cluster0.8o0hx9n.mongodb.net/chat_db?retryWrites=true&w=majority&appName=Cluster0
+      - JWT_SECRET=elserpiente
+      - CLOUDINARY_CLOUD_NAME=vipul-tyagi
+      - CLOUDINARY_API_KEY=972983632167972
+      - CLOUDINARY_API_SECRET=q_TsyjDjMdcZ8vhA9C4Pjjxwbc8
+
+  frontend:
+    build: ./frontend
+    container_name: chatter-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
